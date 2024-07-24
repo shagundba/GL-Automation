@@ -13,66 +13,34 @@ import java.util.List;
 
 @Component
 public class DateUtil {
+
     @Autowired
     private StudentRepo studentRepo;
 
-    public List<Student> fetchDataForPreviousDate() {
-        Calendar calendar = Calendar.getInstance();
-        int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+    public List<Student> fetchDataForDate(LocalDate date) {
         List<Student> data = new ArrayList<>();
 
-        if (dayOfMonth == 4) {
-            Calendar lastMonth = (Calendar) calendar.clone();
-            lastMonth.add(Calendar.MONTH, -1);
-            int lastMonthLength = lastMonth.getActualMaximum(Calendar.DAY_OF_MONTH);
-
-            List<Calendar> dates = Arrays.asList(
-                    getLastDayOfLastMonth(lastMonth, lastMonthLength),
-                    getFirstDayOfCurrentMonth(),
-                    getSecondDayOfCurrentMonth(),
-                    getThirdDayOfCurrentMonth()
+        if (date.getDayOfMonth() == 4) {
+            List<LocalDate> dates = Arrays.asList(
+                    date.minusMonths(1).withDayOfMonth(date.minusMonths(1).lengthOfMonth()), // Last day of last month
+                    date.withDayOfMonth(1),   // First day of current month
+                    date.withDayOfMonth(2),   // Second day of current month
+                    date.withDayOfMonth(3)    // Third day of current month
             );
 
-            for (Calendar date : dates) {
-                data.addAll(studentRepo.findByDate(convertCalendarToLocalDate(date)));
+            for (LocalDate d : dates) {
+                data.addAll(studentRepo.findByDate(d));
             }
         } else {
-            Calendar previousDate = getPreviousDate();
-            data.addAll(studentRepo.findByDate(convertCalendarToLocalDate(previousDate)));
+            LocalDate previousDate = date.minusDays(1);
+            data.addAll(studentRepo.findByDate(previousDate));
         }
+
         return data;
     }
 
-    private Calendar getLastDayOfLastMonth(Calendar lastMonth, int lastMonthLength) {
-        lastMonth.set(Calendar.DAY_OF_MONTH, lastMonthLength);
-        return lastMonth;
-    }
-
-    private Calendar getFirstDayOfCurrentMonth() {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.DAY_OF_MONTH, 1);
-        return calendar;
-    }
-
-    private Calendar getSecondDayOfCurrentMonth() {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.DAY_OF_MONTH, 2);
-        return calendar;
-    }
-
-    private Calendar getThirdDayOfCurrentMonth() {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.DAY_OF_MONTH, 3);
-        return calendar;
-    }
-
-    private Calendar getPreviousDate() {
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DAY_OF_MONTH, -1);
-        return calendar;
-    }
-
-    private LocalDate convertCalendarToLocalDate(Calendar calendar) {
-        return LocalDate.of(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
+    // Helper method to manually set a specific date for testing
+    public static LocalDate getDate(int year, int month, int day) {
+        return LocalDate.of(year, month, day);
     }
 }

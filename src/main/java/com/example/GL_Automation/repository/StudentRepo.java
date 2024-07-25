@@ -9,5 +9,5 @@ import java.util.List;
 public interface StudentRepo extends JpaRepository<Student,Long> 
 {
 
-    List<Student> findByDate(LocalDate date);
+//    List<Student> findByDate(LocalDate date);
 }

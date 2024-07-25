@@ -68,12 +68,12 @@ public class DateCheckService {
     private void handleSpecialCase(LocalDate currentDate) throws IOException {
         LocalDate previousDate = currentDate.minusDays(1);
         List<LocalDate> datesToProcess = Arrays.asList(
-                previousDate.minusDays(2),  // Two days ago
-                previousDate.minusDays(1),  // One day ago
-                previousDate,               // Previous day
-                previousDate.withDayOfMonth(1).minusDays(1) // Last day of previous month
-        );
+                previousDate.withDayOfMonth(1).minusDays(1), // Last day of previous month
+                previousDate.withDayOfMonth(1),  // First day of the current month
+                previousDate.withDayOfMonth(2),  // Second day of the current month
+                previousDate.withDayOfMonth(3)   // Third day of the current month
 
+        );
         for (LocalDate date : datesToProcess) {
             List<Student> data = dateUtil.fetchDataForDate(date);
             System.out.println("Fetched data for date " + date + ": " + data);
@@ -120,7 +120,7 @@ public class DateCheckService {
      * @param date the date associated with the data
      */
     private void uploadToAzureStorage(ByteArrayInputStream excelFile, LocalDate date) {
-        String fileName = "Data_" + date + ".xlsx";
+        String fileName = "Data_" + date.toString() + ".xlsx";
         BlobServiceClient blobServiceClient = new BlobServiceClientBuilder()
                 .endpoint("https://" + accountName + ".blob.core.windows.net")
                 .credential(new StorageSharedKeyCredential(accountName, accountKey))

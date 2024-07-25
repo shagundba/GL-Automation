@@ -18,7 +18,9 @@ public class DateUtil {
     private StudentRepo studentRepo;
 
     public List<Student> fetchDataForDate(LocalDate date) {
-        return studentRepo.findByDate(date);
+        LocalDate previousDate = date.minusDays(1);  // Get the previous day
+        System.out.println("Fetching data for the previous date: " + previousDate);
+        return studentRepo.findByDate(previousDate); // Fetch data for the previous date
     }
 
 }
